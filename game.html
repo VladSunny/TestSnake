@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Змейка</title>
+<style>
+  body {
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+  }
+
+  #gameCanvas {
+    background-color: #000;
+    display: block;
+  }
+</style>
+</head>
+<body>
+<canvas id="gameCanvas" width="400" height="400"></canvas>
+
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const gridSize = 20; // Размер одной клетки
+let tileCountX = canvas.width / gridSize;
+let tileCountY = canvas.height / gridSize;
+let speed = 7;
+
+let xVelocity = 0;
+let yVelocity = 0;
+let snake = [
+  {x: 10, y: 10}
+];
+let apple = spawnApple();
+let score = 0;
+
+function gameLoop() {
+  update();
+  draw();
+}
+
+function update() {
+  moveSnake();
+  if (checkCollision()) {
+    restartGame();
+  }
+  checkAppleCollision();
+}
+
+function draw() {
+  // Фон
+  ctx.fillStyle = 'black';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Змейка
+  ctx.fillStyle = 'green';
+  snake.forEach(part => ctx.fillRect(part.x * gridSize, part.y * gridSize, gridSize, gridSize));
+
+  // Яблоко
+  ctx.fillStyle = 'red';
+  ctx.fillRect(apple.x * gridSize, apple.y * gridSize, gridSize, gridSize);
+
+  // Очки
+  ctx.fillStyle = 'white';
+  ctx.fillText("Очки: " + score, canvas.width - 60, 10);
+}
+
+function moveSnake() {
+  let head = {x: snake[0].x + xVelocity, y: snake[0].y + yVelocity};
+  snake.unshift(head);
+
+  if (head.x === apple.x && head.y === apple.y) {
+    score += 1;
+    apple = spawnApple();
+  } else {
+    snake.pop();
+  }
+}
+
+function checkCollision() {
+  let head = snake[0];
+  if (head.x < 0 || head.y < 0 || head.x >= tileCountX || head.y >= tileCountY) {
+    return true;
+  }
+  for (let i = 1; i < snake.length; i++) {
+    if (head.x === snake[i].x && head.y === snake[i].y) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function restartGame() {
+  score = 0;
+  snake = [{x: 10, y: 10}];
+  apple = spawnApple();
+  xVelocity = yVelocity = 0;
+}
+
+function checkAppleCollision() {
+  if (apple.x === snake[0].x && apple.y === snake[0].y) {
+    snake.push({});
+    apple = spawnApple();
+  }
+}
+
+function spawnApple() {
+  return {
+    x: Math.floor(Math.random() * tileCountX),
+    y: Math.floor(Math.random() * tileCountY)
+  };
+}
+
+document.addEventListener('keydown', keyDown);
+
+function keyDown(e) {
+  switch(e.keyCode) {
+    case 37: // left arrow
+      if (xVelocity === 1) break;
+      xVelocity = -1; yVelocity = 0;
+      break;
+    case 38: // up arrow
+      if (yVelocity === 1) break;
+      xVelocity = 0; yVelocity = -1;
+      break;
+    case 39: // right arrow
+      if (xVelocity === -1) break;
+      xVelocity = 1; yVelocity = 0;
+      break;
+    case 40: // down arrow
+      if (yVelocity === -1) break;
+      xVelocity = 0; yVelocity = 1;
+      break;
+  }
+}
+
+setInterval(gameLoop, 1000 / speed);
+
+</script>
+</body>
+</html>
