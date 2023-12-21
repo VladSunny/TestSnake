@@ -28,7 +28,7 @@ const ctx = canvas.getContext('2d');
 const gridSize = 20; // Размер одной клетки
 let tileCountX = canvas.width / gridSize;
 let tileCountY = canvas.height / gridSize;
-let speed = 7;
+let speed = getSpeedFromUrl();
 
 let xVelocity = 0;
 let yVelocity = 0;
@@ -136,6 +136,17 @@ function keyDown(e) {
       xVelocity = 0; yVelocity = 1;
       break;
   }
+}
+
+function getSpeedFromUrl() {
+    const searchParams = new URLSearchParams(window.location.search);
+    if (searchParams.has('speed')) {
+        const speedParam = parseInt(searchParams.get('speed'), 10);
+        if (!isNaN(speedParam) && speedParam > 0) {
+            return speedParam;
+        }
+    }
+    return 7; // Значение скорости по умолчанию.
 }
 
 setInterval(gameLoop, 1000 / speed);
