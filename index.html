@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Змейка</title>
+<button onclick="TelegramGameProxy.shareScore()">Share score</button>
 <style>
   body {
     background-color: #f4f4f4;
@@ -152,5 +153,6 @@ function getSpeedFromUrl() {
 setInterval(gameLoop, 1000 / speed);
 
 </script>
+<script src="https://telegram.org/js/games.js"></script>
 </body>
 </html>
